@@ -21,6 +21,7 @@ services:
     env_file: .env
     volumes:
       - data_db:/var/lib/mysql
+      - data_mysqld:/run/mysqld
 
   # The Mail Transfer Agent (Postfix) receives incoming mail
   # on TCP port 25.
@@ -32,6 +33,7 @@ services:
     env_file: .env
     volumes:
       - data_tls:/media/tls:ro
+      - data_spool:/var/spool/postfix
       # For using external certificates uncomment the following lines
       # and change the path on the left side of the colon.
       # - /home/user/certs/mail.example.com.crt:/media/tls/mailserver.crt:ro
@@ -120,3 +122,5 @@ volumes:
   data_tls:
   data_filter:
   data_virusdb:
+  data_spool:
+  data_mysqld:
