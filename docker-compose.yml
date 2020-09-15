@@ -6,29 +6,32 @@ services:
   ssl:
     image: jeboehm/mailserver-ssl:latest
     build: ./ssl
+    container_name: mailserver_ssl
     env_file: .env
     volumes:
-      - data-tls:/media/tls:rw
+      - mailserver_tls:/media/tls:rw
 
   # Responsible for storing users and their aliases. Remove
   # if you already have a MySQL server.
   db:
     image: jeboehm/mailserver-db:latest
     build: ./db
+    container_name: mailserver_db
     restart: on-failure:5
     env_file: .env
     volumes:
-      - data-db:/var/lib/mysql
+      - mailserver_db:/var/lib/mysql
 
   # The Mail Transfer Agent (Postfix) receives incoming mail
   # on TCP port 25.
   mta:
     image: jeboehm/mailserver-mta:latest
     build: ./mta
+    container_name: mailserver_mta
     restart: on-failure:5
     env_file: .env
     volumes:
-      - data-tls:/media/tls:ro
+      - mailserver_tls:/media/tls:ro
       # For using external certificates uncomment the following lines
       # and change the path on the left side of the colon.
       # - /home/user/certs/mail.example.com.crt:/media/tls/mailserver.crt:ro
@@ -40,11 +43,12 @@ services:
   mda:
     image: jeboehm/mailserver-mda:latest
     build: ./mda
+    container_name: mailserver_mda
     restart: on-failure:5
     env_file: .env
     volumes:
-      - data-mail:/var/vmail
-      - data-tls:/media/tls:ro
+      - mailserver_mail:/var/vmail
+      - mailserver_tls:/media/tls:ro
       # For using external certificates uncomment the following lines
       # and change the path on the left side of the colon.
       # - /home/user/certs/mail.example.com.crt:/media/tls/mailserver.crt:ro
@@ -55,10 +59,11 @@ services:
   web:
     image: jeboehm/mailserver-web:latest
     build: ./web
+    container_name: mailserver_web
     restart: on-failure:5
     env_file: .env
     volumes:
-      - data-dkim:/media/dkim
+      - mailserver_dkim:/media/dkim
     # For use with jwilder/nginx-proxy.
     # environment:
     #   - VIRTUAL_HOST=mail.example.com
@@ -68,11 +73,12 @@ services:
   filter:
     image: jeboehm/mailserver-filter:latest
     build: ./filter
+    container_name: mailserver_filter
     restart: on-failure:5
     env_file: .env
     volumes:
-      - data-filter:/var/lib/rspamd
-      - data-dkim:/media/dkim
+      - mailserver_filter:/var/lib/rspamd
+      - mailserver_dkim:/media/dkim
     links:
       - virus:virus.local
 
@@ -81,10 +87,11 @@ services:
   virus:
     image: jeboehm/mailserver-virus:latest
     build: ./virus
+    container_name: mailserver_virus
     restart: on-failure:5
     env_file: .env
     volumes:
-      - data-virusdb:/var/lib/clamav
+      - mailserver_virusdb:/var/lib/clamav
 
   # If you want unhealthy containers to be restarted automatically
   # just uncomment the following lines.
@@ -104,12 +111,12 @@ services:
   #   build: ./virus/contrib/unofficial-sigs
   #   env_file: .env
   #   volumes:
-  #     - data-virusdb:/var/lib/clamav
+  #     - mailserver_virusdb:/var/lib/clamav
 
 volumes:
-  data-db:
-  data-dkim:
-  data-mail:
-  data-tls:
-  data-filter:
-  data-virusdb:
+  mailserver_db:
+  mailserver_dkim:
+  mailserver_mail:
+  mailserver_tls:
+  mailserver_filter:
+  mailserver_virusdb:
