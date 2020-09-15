@@ -9,7 +9,7 @@ services:
     container_name: mailserver_ssl
     env_file: .env
     volumes:
-      - mailserver_tls:/media/tls:rw
+      - data_tls:/media/tls:rw
 
   # Responsible for storing users and their aliases. Remove
   # if you already have a MySQL server.
@@ -20,7 +20,7 @@ services:
     restart: on-failure:5
     env_file: .env
     volumes:
-      - mailserver_db:/var/lib/mysql
+      - data_db:/var/lib/mysql
 
   # The Mail Transfer Agent (Postfix) receives incoming mail
   # on TCP port 25.
@@ -31,7 +31,7 @@ services:
     restart: on-failure:5
     env_file: .env
     volumes:
-      - mailserver_tls:/media/tls:ro
+      - data_tls:/media/tls:ro
       # For using external certificates uncomment the following lines
       # and change the path on the left side of the colon.
       # - /home/user/certs/mail.example.com.crt:/media/tls/mailserver.crt:ro
@@ -47,8 +47,8 @@ services:
     restart: on-failure:5
     env_file: .env
     volumes:
-      - mailserver_mail:/var/vmail
-      - mailserver_tls:/media/tls:ro
+      - data_mail:/var/vmail
+      - data_tls:/media/tls:ro
       # For using external certificates uncomment the following lines
       # and change the path on the left side of the colon.
       # - /home/user/certs/mail.example.com.crt:/media/tls/mailserver.crt:ro
@@ -63,7 +63,7 @@ services:
     restart: on-failure:5
     env_file: .env
     volumes:
-      - mailserver_dkim:/media/dkim
+      - data_dkim:/media/dkim
     # For use with jwilder/nginx-proxy.
     # environment:
     #   - VIRTUAL_HOST=mail.example.com
@@ -77,8 +77,8 @@ services:
     restart: on-failure:5
     env_file: .env
     volumes:
-      - mailserver_filter:/var/lib/rspamd
-      - mailserver_dkim:/media/dkim
+      - data_filter:/var/lib/rspamd
+      - data_dkim:/media/dkim
     links:
       - virus:virus.local
 
@@ -91,7 +91,7 @@ services:
     restart: on-failure:5
     env_file: .env
     volumes:
-      - mailserver_virusdb:/var/lib/clamav
+      - data_virusdb:/var/lib/clamav
 
   # If you want unhealthy containers to be restarted automatically
   # just uncomment the following lines.
@@ -111,12 +111,12 @@ services:
   #   build: ./virus/contrib/unofficial-sigs
   #   env_file: .env
   #   volumes:
-  #     - mailserver_virusdb:/var/lib/clamav
+  #     - data_virusdb:/var/lib/clamav
 
 volumes:
-  mailserver_db:
-  mailserver_dkim:
-  mailserver_mail:
-  mailserver_tls:
-  mailserver_filter:
-  mailserver_virusdb:
+  data_db:
+  data_dkim:
+  data_mail:
+  data_tls:
+  data_filter:
+  data_virusdb:
